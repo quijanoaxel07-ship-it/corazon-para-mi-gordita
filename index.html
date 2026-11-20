@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para ti ❤️</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: black;
+        overflow: hidden;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        font-family: Arial, sans-serif;
+    }
+
+    canvas {
+        width: min(95vw, 95vh);
+        height: min(95vw, 95vh);
+    }
+
+    h2 {
+        color: #ffb3c7;
+        font-size: 22px;
+        margin-top: -20px;
+        opacity: 0;
+        transition: opacity 2s;
+        text-align: center;
+    }
+
+    h2.visible {
+        opacity: 1;
+    }
+</style>
+</head>
+
+<body>
+
+<canvas id="heart"></canvas>
+<h2 id="message">Hecho especialmente para ti ❤️</h2>
+
+<script>
+const canvas = document.getElementById("heart");
+const ctx = canvas.getContext("2d");
+
+const size = 700;
+canvas.width = size;
+canvas.height = size;
+
+function heartX(a) {
+    return 16 * Math.pow(Math.sin(a), 3);
+}
+
+function heartY(a) {
+    return 13 * Math.cos(a)
+        - 5 * Math.cos(2*a)
+        - 2 * Math.cos(3*a)
+        - Math.cos(4*a);
+}
+
+const N = 200;
+const steps = 20;
+const outerScale = 18;
+const innerScale = 5;
+
+const pink = [1.0, 0.70, 0.78];
+const black = [0, 0, 0];
+
+let i = 0;
+let j = 0;
+
+function drawSegment() {
+    if (i >= N) {
+        document.getElementById("message")
+            .classList.add("visible");
+        return;
+    }
+
+    const angle = 2 * Math.PI * i / N;
+
+    const xo = heartX(angle) * outerScale;
+    const yo = heartY(angle) * outerScale;
+
+    const xi = heartX(angle) * innerScale;
+    const yi = heartY(angle) * innerScale;
+
+    const f1 = j / steps;
+    const f2 = (j + 1) / steps;
+
+    const x1 = xo + (xi - xo) * f1;
+    const y1 = yo + (yi - yo) * f1;
+
+    const x2 = xo + (xi - xo) * f2;
+    const y2 = yo + (yi - yo) * f2;
+
+    const r = pink[0] + (black[0] - pink[0]) * f1;
+    const g = pink[1] + (black[1] - pink[1]) * f1;
+    const b = pink[2] + (black[2] - pink[2]) * f1;
+
+    const color = `rgb(${r*255}, ${g*255}, ${b*255})`;
+    const width = 2.2 - 1.7 * f1;
+
+    ctx.beginPath();
+    ctx.moveTo(size/2 + x1, size/2 - y1);
+    ctx.lineTo(size/2 + x2, size/2 - y2);
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineCap = "round";
+    ctx.stroke();
+
+    j++;
+
+    if (j >= steps) {
+        j = 0;
+        i++;
+        setTimeout(drawSegment, 30);
+    } else {
+        setTimeout(drawSegment, 1);
+    }
+}
+
+drawSegment();
+</script>
+
+</body>
+</html>
